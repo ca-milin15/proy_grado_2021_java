@@ -1,0 +1,9 @@
+package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.service;
+
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaRequest;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaResponse;
+
+public interface RegistroService {
+
+	RegistroBiometriaResponse registrarDatosBiometricos(RegistroBiometriaRequest registroBiometriaRequest);
+}
