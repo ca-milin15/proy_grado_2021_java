@@ -1,0 +1,7 @@
+amazon-properties:
+  registro:
+    bucket-name: registro-biometrico
+    bucket-file-context: registro-biometrico/
+  autenticacion:
+    bucket-name: autenticacion-biometrica
+    bucket-file-context: tmp/
