@@ -1,5 +1,4 @@
-package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.service;
-
+package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.service;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,13 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.almacenamiento.AlmacenamientoService;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionBiometricaAWSResponse;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionBiometricaResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest.ObjectRequest;
-import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSResponse;
-import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.AWSPropiedadesSistema;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.Utilidades;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -28,40 +26,40 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AWSRegistroServiceImpl implements RegistroService{
+public class AWSAutenticacionServiceImpl implements AutenticacionService {
 
 	AlmacenamientoService almacenamientoService;
 	ObjectMapper objectMapper;
 	AWSPropiedadesSistema awsPropiedadesSistema;
-
+	
 	@Override
-	public RegistroBiometriaResponse registrarDatosBiometricos(MultipartFile multipartFileFotografia) {
+	public AutenticacionBiometricaResponse autenticar(MultipartFile multipartFile) {
 		try {
-			var fotografia = Utilidades.crearArchivoDesdeMultipart(multipartFileFotografia);
+			var fotografia = Utilidades.crearArchivoDesdeMultipart(multipartFile);
 			var cargarArchivoS3Respuesta = almacenamientoService.cargarObjeto(
-					awsPropiedadesSistema.getRegistro().getBucketName(), 
-					awsPropiedadesSistema.getRegistro().getBucketFileContext(),
+					awsPropiedadesSistema.getAutenticacion().getBucketName(), 
+					awsPropiedadesSistema.getAutenticacion().getBucketFileContext(),
 					fotografia
 			);
-			log.info("cargarArchivoS3Respuesta: ".concat(objectMapper.writeValueAsString(cargarArchivoS3Respuesta)));
-			procesoConsumoRegistroDatosBiometricosAWS(
+			log.info("autenticar: ".concat(objectMapper.writeValueAsString(cargarArchivoS3Respuesta)));
+			procesoConsumoAutenticacionDatosBiometricosAWS(
 					RegistroBiometriaAWSRequest.builder()
 						.objectRequest(
 							ObjectRequest.builder()
-										 .imageBucketName(awsPropiedadesSistema.getRegistro().getBucketFileContext().concat(multipartFileFotografia.getOriginalFilename()))
+										 .imageBucketName(awsPropiedadesSistema.getRegistro().getBucketFileContext().concat(multipartFile.getOriginalFilename()))
 										 .imageS3Bucket(awsPropiedadesSistema.getRegistro().getBucketName() )
 										 .build()
 					    )
-						.operationType("SIGNUP")
+						.operationType("AUTH")
 						.build()
 			);
-			return null; 
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
+		return null;
 	}
-
-	private void procesoConsumoRegistroDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
+	
+	private void procesoConsumoAutenticacionDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
 		try {
 			var endPointRegistro = new StringBuilder()
 					.append(awsPropiedadesSistema.getAwsApiService().getContext())
@@ -73,13 +71,12 @@ public class AWSRegistroServiceImpl implements RegistroService{
 					.POST(BodyPublishers.ofString(objectMapper.writeValueAsString(registroBiometriaAWSRequest)))
 					.build();
 			var response = client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
-			var registroBiometriaAWSResponse = objectMapper.readValue(response.join().body(), RegistroBiometriaAWSResponse.class);
-			System.out.println("registroBiometriaAWSResponse: ".concat(objectMapper.writeValueAsString(registroBiometriaAWSResponse)));
+			var autenticacionBiometricaAWSResponse = objectMapper.readValue(response.join().body(), AutenticacionBiometricaAWSResponse.class);
+			System.out.println("autenticacionBiometricaAWSResponse: ".concat(objectMapper.writeValueAsString(autenticacionBiometricaAWSResponse)));
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
 		
 	}
-	
 
 }
