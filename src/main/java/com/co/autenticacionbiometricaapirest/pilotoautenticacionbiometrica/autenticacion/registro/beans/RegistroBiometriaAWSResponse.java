@@ -22,6 +22,7 @@ public class RegistroBiometriaAWSResponse implements Serializable{
 
 	int statusCode;
 	Body body;
+	String errorMessage;
 	
 	@Getter
 	@Setter
@@ -30,5 +31,7 @@ public class RegistroBiometriaAWSResponse implements Serializable{
 	@NoArgsConstructor
 	public static class Body {
 		String faceId;
+		String errorMessage;
+		String errorType;
 	}
 }

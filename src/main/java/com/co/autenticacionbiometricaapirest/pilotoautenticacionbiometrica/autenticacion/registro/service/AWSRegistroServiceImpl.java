@@ -9,7 +9,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 
+import javax.management.RuntimeErrorException;
+
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.almacenamiento.AlmacenamientoService;
@@ -61,7 +64,7 @@ public class AWSRegistroServiceImpl implements RegistroService{
 		}
 	}
 
-	private void procesoConsumoRegistroDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
+	private RegistroBiometriaResponse procesoConsumoRegistroDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
 		try {
 			var endPointRegistro = new StringBuilder()
 					.append(awsPropiedadesSistema.getAwsApiService().getContext())
@@ -74,7 +77,11 @@ public class AWSRegistroServiceImpl implements RegistroService{
 					.build();
 			var response = client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
 			var registroBiometriaAWSResponse = objectMapper.readValue(response.join().body(), RegistroBiometriaAWSResponse.class);
-			System.out.println("registroBiometriaAWSResponse: ".concat(objectMapper.writeValueAsString(registroBiometriaAWSResponse)));
+			if(!ObjectUtils.isEmpty(registroBiometriaAWSResponse.getErrorMessage())) {
+				throw new RuntimeException(registroBiometriaAWSResponse.getErrorMessage());
+			} else {
+				return RegistroBiometriaResponse.builder().fotografia("").build();
+			}
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
