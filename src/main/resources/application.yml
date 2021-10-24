@@ -1,7 +1,16 @@
 amazon-properties:
+  config:
+    ak: ENC(dCX3n1WnXS/cKGZMIiOc/RyXKr3PTLtqxGLTEtWws7Y=)
+    sk: ENC(wEyU5IqxlADHRH89KQw+wYNQTaLX37YNfo6NvLtf5NSUKXd8g74o/Jd/cJCsxbizIFwSoJ1CTEk=)
   registro:
     bucket-name: registro-biometrico
     bucket-file-context: registro-biometrico/
   autenticacion:
     bucket-name: autenticacion-biometrica
     bucket-file-context: tmp/
+  aws-api-service:
+    context: https://sna925yu4a.execute-api.us-east-1.amazonaws.com/dev/
+    registro:
+      end-point: registro-biometrico
+    autenticacion:
+      end-point: autenticacion-biometrica
