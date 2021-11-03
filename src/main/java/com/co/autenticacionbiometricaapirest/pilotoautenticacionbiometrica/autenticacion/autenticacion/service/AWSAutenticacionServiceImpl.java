@@ -8,6 +8,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,9 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.auten
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest.ObjectRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.AWSPropiedadesSistema;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.MensajesSistema;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.Utilidades;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -31,6 +34,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	AlmacenamientoService almacenamientoService;
 	ObjectMapper objectMapper;
 	AWSPropiedadesSistema awsPropiedadesSistema;
+	MensajesSistema mensajesSistema;
 	
 	@Override
 	public AutenticacionBiometricaResponse autenticar(MultipartFile multipartFile) {
@@ -41,6 +45,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 					awsPropiedadesSistema.getAutenticacion().getBucketFileContext(),
 					fotografia
 			);
+			System.out.println("autenticar: ".concat(objectMapper.writeValueAsString(cargarArchivoS3Respuesta)));
 			log.info("autenticar: ".concat(objectMapper.writeValueAsString(cargarArchivoS3Respuesta)));
 			procesoConsumoAutenticacionDatosBiometricosAWS(
 					RegistroBiometriaAWSRequest.builder()
@@ -54,7 +59,9 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 						.build()
 			);
 		} catch (Exception e) {
-			// TODO: handle exception
+			log.error(ExceptionUtils.getMessage(e));
+			log.error(ExceptionUtils.getRootCauseMessage(e));
+			throw new RuntimeException(MessageStaticClass.ERR_PROCESO_AUTENTICACION.getMensaje());
 		}
 		return null;
 	}
@@ -72,9 +79,11 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 					.build();
 			var response = client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
 			var autenticacionBiometricaAWSResponse = objectMapper.readValue(response.join().body(), AutenticacionBiometricaAWSResponse.class);
-			System.out.println("autenticacionBiometricaAWSResponse: ".concat(objectMapper.writeValueAsString(autenticacionBiometricaAWSResponse)));
+			log.info("autenticacionBiometricaAWSResponse: ".concat(objectMapper.writeValueAsString(autenticacionBiometricaAWSResponse)));
 		} catch (IOException e) {
-			throw new RuntimeException();
+			log.error(ExceptionUtils.getMessage(e));
+			log.error(ExceptionUtils.getRootCauseMessage(e));
+			throw new RuntimeException(MessageStaticClass.ERR_CONSUMO_AUTENTICACION.getMensaje());
 		}
 		
 	}

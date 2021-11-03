@@ -1,3 +1,39 @@
+spring:
+  profiles: dev
+  datasource:
+    url: "jdbc:mysql://localhost:3306/autenticacion-biometrica?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    
+---
+
+spring:
+  profiles: test
+  datasource:
+    url: "jdbc:mysql://autenticacion-biometrica-test.cuhwiikx8iqy.us-east-1.rds.amazonaws.com:3306/autenticacion-biometrica?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    username: admin
+    password: yoqYSY971231
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+---
+
+spring:
+  profiles: pilot
+  datasource:
+    url: "jdbc:mysql://localhost:3306/autenticacion-biometrica?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    
+---
+
 amazon-properties:
   config:
     ak: ENC(dCX3n1WnXS/cKGZMIiOc/RyXKr3PTLtqxGLTEtWws7Y=)
@@ -14,3 +50,7 @@ amazon-properties:
       end-point: registro-biometrico
     autenticacion:
       end-point: autenticacion-biometrica
+
+mensajes-sistema:
+  archivo:
+    error-creacion-archivo-en-servidor: Se produjo un error intentando crear el archivo temporal en el servidor.

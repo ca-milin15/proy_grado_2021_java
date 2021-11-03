@@ -8,20 +8,33 @@ import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.experimental.UtilityClass;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @UtilityClass
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Utilidades {
 
+	
 	public File crearArchivoDesdeMultipart (MultipartFile multipart) {
-		var pathFile = Paths.get(System.getProperty("java.io.tmpdir").concat(multipart.getOriginalFilename()));
+		var pathFile = Paths.get(System.getProperty("java.io.tmpdir"), multipart.getOriginalFilename());
+		log.info("crearArchivoDesdeMultipart: ".concat(pathFile.toString()));
 		try {
 			Files.copy(multipart.getInputStream(), pathFile);
 			return pathFile.toFile();
 		} catch (FileAlreadyExistsException e) {
 			return pathFile.toFile();
 		} catch (IOException e) {
-			throw new RuntimeException();
+			log.error(e.getMessage());
+			throw new RuntimeException(MessageStaticClass.ERR_CONSTRUCT_ARCHIVO.getMensaje());
 		}
 	}
+
+
+
 }

@@ -4,9 +4,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.AWSPropiedadesSistema;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,18 +30,24 @@ public class S3AlmacenamientoServiceImpl implements AlmacenamientoService {
 	
 	@Override
 	public String cargarObjeto(String bucketName, String fileName, File fotografia) {
-		var awsCredentials = AwsBasicCredentials.create(
-				propiedadesSistema.getConfig().getAk(), 
-				propiedadesSistema.getConfig().getSk()
-		);
-		var s3ClientConfig = S3ClientConfiguration.builder()
-					.region(Region.US_EAST_1)
-					.credentialsProvider(StaticCredentialsProvider.create(awsCredentials)).build();
-		var s3TransferManager = S3TransferManager.builder().s3ClientConfiguration(s3ClientConfig).build();
-		s3TransferManager.upload(builder -> 
-			builder.putObjectRequest(poq -> 
-				poq.bucket(bucketName).key(fileName.concat(fotografia.getName()))).source(Path.of(fotografia.getPath())));
-		return new StringBuilder().append(bucketName).append("/").append(fileName).append(fotografia.getName()).toString();
+		try {
+			var awsCredentials = AwsBasicCredentials.create(
+					propiedadesSistema.getConfig().getAk(), 
+					propiedadesSistema.getConfig().getSk()
+			);
+			var s3ClientConfig = S3ClientConfiguration.builder()
+						.region(Region.US_EAST_1)
+						.credentialsProvider(StaticCredentialsProvider.create(awsCredentials)).build();
+			var s3TransferManager = S3TransferManager.builder().s3ClientConfiguration(s3ClientConfig).build();
+			s3TransferManager.upload(builder -> 
+				builder.putObjectRequest(poq -> 
+					poq.bucket(bucketName).key(fileName.concat(fotografia.getName()))).source(Path.of(fotografia.getPath())));
+			return new StringBuilder().append(bucketName).append("/").append(fileName).append(fotografia.getName()).toString();
+		} catch (Exception e) {
+			log.error(ExceptionUtils.getMessage(e));
+			log.error(ExceptionUtils.getRootCauseMessage(e));
+			throw new RuntimeException(MessageStaticClass.ERR_CARGA_ARCHIVO.getMensaje());
+		}
 	}
 
 	@Override
@@ -52,8 +60,9 @@ public class S3AlmacenamientoServiceImpl implements AlmacenamientoService {
 			log.info("descargarObjeto: ".concat(objectMapper.writeValueAsString(download.completionFuture().join().response())));
 			return null;
 		} catch (JsonProcessingException e) {
-			log.error(e.getOriginalMessage());
-			throw new RuntimeException();
+			log.error(ExceptionUtils.getMessage(e));
+			log.error(ExceptionUtils.getRootCauseMessage(e));
+			throw new RuntimeException(MessageStaticClass.ERR_DESCARGA_ARCHIVO.getMensaje());
 		}
 	}
 
