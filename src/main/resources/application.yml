@@ -1,5 +1,7 @@
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
   datasource:
     url: "jdbc:mysql://localhost:3306/autenticacion-biometrica?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
     username: root
@@ -11,19 +13,23 @@ spring:
 ---
 
 spring:
-  profiles: test
+  config:
+    activate:
+      on-profile: test
   datasource:
-    url: "jdbc:mysql://autenticacion-biometrica-test.cuhwiikx8iqy.us-east-1.rds.amazonaws.com:3306/autenticacion-biometrica?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    url: "jdbc:mysql://autenticacion-biometrica-test.cuhwiikx8iqy.us-east-1.rds.amazonaws.com:3306/autenticacion-biometrica"
     username: admin
-    password: yoqYSY971231
+    password: yoqYSY971
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.MySQLInnoDBDialect
 
 ---
 
 spring:
-  profiles: pilot
+  config:
+    activate:
+      on-profile: pilot
   datasource:
     url: "jdbc:mysql://localhost:3306/autenticacion-biometrica?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
     username: root
