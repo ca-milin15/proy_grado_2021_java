@@ -18,7 +18,6 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.auten
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest.ObjectRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.AWSPropiedadesSistema;
-import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.MensajesSistema;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.Utilidades;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +33,6 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	AlmacenamientoService almacenamientoService;
 	ObjectMapper objectMapper;
 	AWSPropiedadesSistema awsPropiedadesSistema;
-	MensajesSistema mensajesSistema;
 	
 	@Override
 	public AutenticacionBiometricaResponse autenticar(MultipartFile multipartFile) {

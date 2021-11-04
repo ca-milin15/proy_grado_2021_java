@@ -25,18 +25,18 @@ public class UsuarioInfoBiometrica  extends EntidadGeneral{
 	private static final long serialVersionUID = -8172577303672087596L;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "idUser")
+	@JoinColumn(name = "id_user")
 	Usuario usuario;
 	
-	@Column(name = "faceId")
+	@Column(name = "face_id")
 	String idRostro;
 	
-	@Column(name = "externalId")
+	@Column(name = "external_id")
 	String idExternal;
 	
-	@Column(name = "bucketS3name")
+	@Column(name = "bucket_name")
 	String rutaFoto;
 	
-	@Column(name = "fileName")
+	@Column(name = "file_name")
 	String nombreFotografia;
 }

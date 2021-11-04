@@ -10,4 +10,5 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admin
 @Repository
 public interface UsuarioServiceRepository extends JpaRepository<Usuario, BigInteger>{
 
+	Usuario findByUsuarioAndClave(String usuario, String clave);
 }

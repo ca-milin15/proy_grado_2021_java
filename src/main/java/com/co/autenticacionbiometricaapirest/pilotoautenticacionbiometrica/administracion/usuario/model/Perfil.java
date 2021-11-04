@@ -32,6 +32,6 @@ public class Perfil extends EntidadGeneral {
 	Usuario usuario;
 	
 	@OneToMany
-	@JoinColumn(name = "idResource")
+	@JoinColumn(name = "id_resource")
 	List<Recurso> recursos;
 }

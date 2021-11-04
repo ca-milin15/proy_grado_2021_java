@@ -12,8 +12,10 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class UsuarioResponse  implements Serializable{
+public class AutenticacionBasicaRequest implements Serializable{
 
-	private static final long serialVersionUID = -5145934024185907079L;
+	private static final long serialVersionUID = -449250944151246649L;
 
+	String usuario;
+	String clave;
 }

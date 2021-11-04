@@ -32,14 +32,14 @@ public class Usuario extends EntidadGeneral{
 	@Column(name = "name")
 	String nombre;
 	
-	@Column(name = "lastName")
+	@Column(name = "lastname")
 	String apellidos;
 	
 	@Column(name = "identification")
 	String identificacion;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "idProfile")
+	@JoinColumn(name = "id_profile")
 	Perfil perfil;
 
 	@OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)

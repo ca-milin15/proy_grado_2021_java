@@ -1,10 +1,13 @@
 package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.service;
 
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.AutenticacionBasicaRequest;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.AutenticacionBasicaResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.UsuarioRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.UsuarioResponse;
 
 public interface UsuarioService {
 
+	AutenticacionBasicaResponse autenticacionBasica( AutenticacionBasicaRequest autenticacionBasicaRequest);
 	UsuarioResponse crearUsuario(UsuarioRequest usuarioRequest);
 	UsuarioResponse actualizarUsuario(UsuarioRequest usuarioRequest);
 }
