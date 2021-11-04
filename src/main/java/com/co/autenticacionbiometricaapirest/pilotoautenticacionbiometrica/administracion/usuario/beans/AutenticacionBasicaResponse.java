@@ -19,6 +19,7 @@ public class AutenticacionBasicaResponse implements Serializable{
 
 	private static final long serialVersionUID = -8374305449469163735L;
 
+	BigInteger id;
 	String usuario;
 	String nombre;
 	String apellido;
@@ -28,6 +29,7 @@ public class AutenticacionBasicaResponse implements Serializable{
 
 	public AutenticacionBasicaResponse(Usuario usuarioAutenticado) {
 		var perfil = usuarioAutenticado.getPerfil();
+		this.id = usuarioAutenticado.getId();
 		this.usuario = usuarioAutenticado.getUsuario();
 		this.nombre = usuarioAutenticado.getNombre();
 		this.apellido = usuarioAutenticado.getApellidos();

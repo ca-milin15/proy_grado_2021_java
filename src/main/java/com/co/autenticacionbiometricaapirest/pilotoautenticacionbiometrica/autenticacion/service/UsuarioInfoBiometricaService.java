@@ -1,0 +1,8 @@
+package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.service;
+
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.model.UsuarioInfoBiometrica;
+
+public interface UsuarioInfoBiometricaService {
+
+	UsuarioInfoBiometrica almacenarEntidad(UsuarioInfoBiometrica usuarioInfoBiometrica);
+}

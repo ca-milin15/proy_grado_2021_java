@@ -14,7 +14,9 @@ public enum MessageStaticClass {
 	ERR_PROCESO_AUTENTICACION ("Ha ocurrido un error en el proceso de autenticacion."),
 	ERR_CONSUMO_AUTENTICACION ("Ha ocurrido un error en el proceso en el sistema de autenticacion."),
 	
-	USUARIO_NO_ENCONTRADO ("El usuario no se encuentra registrado en el sistema.");
+	USUARIO_NO_ENCONTRADO ("El usuario no se encuentra registrado en el sistema."),
+
+	ERR_USUARIO_INFO_BIOM_PERSISTENCIA ("Ha ocurrido un error almacenando la información biometrica del usuario.");
 	
 	String mensaje;
 

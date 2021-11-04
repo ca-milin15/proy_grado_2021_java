@@ -1,13 +1,17 @@
 package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.service;
 
+import java.math.BigInteger;
+
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.AutenticacionBasicaRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.AutenticacionBasicaResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.UsuarioRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.UsuarioResponse;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.model.Usuario;
 
 public interface UsuarioService {
 
 	AutenticacionBasicaResponse autenticacionBasica( AutenticacionBasicaRequest autenticacionBasicaRequest);
 	UsuarioResponse crearUsuario(UsuarioRequest usuarioRequest);
 	UsuarioResponse actualizarUsuario(UsuarioRequest usuarioRequest);
+	Usuario buscarUsuarioPorId(BigInteger idUsuario);
 }

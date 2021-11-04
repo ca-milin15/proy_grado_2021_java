@@ -11,6 +11,7 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admin
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.model.Usuario;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Setter
 @Getter
+@Builder
 @Table(name = "user_info_biometric")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UsuarioInfoBiometrica  extends EntidadGeneral{
