@@ -27,5 +27,6 @@ public class RegistroBiometriaAWSRequest implements Serializable{
 	public static class ObjectRequest {
 		String imageS3Bucket;
 		String imageBucketName;
+		String externalId;
 	}
 }

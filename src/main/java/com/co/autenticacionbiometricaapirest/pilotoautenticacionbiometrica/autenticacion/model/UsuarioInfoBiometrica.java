@@ -11,8 +11,10 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admin
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.model.Usuario;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
@@ -22,6 +24,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @Table(name = "user_info_biometric")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioInfoBiometrica  extends EntidadGeneral{
 
 	private static final long serialVersionUID = -8172577303672087596L;

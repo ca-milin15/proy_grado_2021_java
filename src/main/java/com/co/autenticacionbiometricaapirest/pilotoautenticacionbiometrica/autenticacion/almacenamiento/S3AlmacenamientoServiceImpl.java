@@ -56,10 +56,10 @@ public class S3AlmacenamientoServiceImpl implements AlmacenamientoService {
 			var s3TransferManager = S3TransferManager.create();
 			var download = s3TransferManager.download(builder -> 
 				builder.getObjectRequest(poq -> 
-					poq.bucket(nombreRepositorioS3).key(nombreArchivo)).destination(Paths.get("downloadedFile.txt")));
+					poq.bucket(nombreRepositorioS3).key(nombreArchivo)).destination(Paths.get(System.getProperty("java.io.tmpdir"), nombreArchivo)));
 			log.info("descargarObjeto: ".concat(objectMapper.writeValueAsString(download.completionFuture().join().response())));
 			return null;
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			log.error(ExceptionUtils.getMessage(e));
 			log.error(ExceptionUtils.getRootCauseMessage(e));
 			throw new RuntimeException(MessageStaticClass.ERR_DESCARGA_ARCHIVO.getMensaje());

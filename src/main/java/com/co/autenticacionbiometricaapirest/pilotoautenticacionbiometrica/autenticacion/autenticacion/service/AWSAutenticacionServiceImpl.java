@@ -1,6 +1,7 @@
 package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.service;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
@@ -10,6 +11,8 @@ import java.net.http.HttpResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.almacenamiento.AlmacenamientoService;
@@ -17,9 +20,11 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.auten
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionBiometricaResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest.ObjectRequest;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.service.UsuarioInfoBiometricaService;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.AWSPropiedadesSistema;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.Utilidades;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.RostroNoEncontradoRuntimeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +38,10 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	AlmacenamientoService almacenamientoService;
 	ObjectMapper objectMapper;
 	AWSPropiedadesSistema awsPropiedadesSistema;
+	UsuarioInfoBiometricaService usuarioInfoBiometricaService;
+
+	
+	private final static Integer UMBRAL_SIMILIRIDAD = 99;
 	
 	@Override
 	public AutenticacionBiometricaResponse autenticar(MultipartFile multipartFile) {
@@ -45,26 +54,43 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 			);
 			System.out.println("autenticar: ".concat(objectMapper.writeValueAsString(cargarArchivoS3Respuesta)));
 			log.info("autenticar: ".concat(objectMapper.writeValueAsString(cargarArchivoS3Respuesta)));
-			procesoConsumoAutenticacionDatosBiometricosAWS(
+			var autenticacionBiometricaAWSResponse = procesoConsumoAutenticacionDatosBiometricosAWS(
 					RegistroBiometriaAWSRequest.builder()
 						.objectRequest(
 							ObjectRequest.builder()
-										 .imageBucketName(awsPropiedadesSistema.getRegistro().getBucketFileContext().concat(multipartFile.getOriginalFilename()))
-										 .imageS3Bucket(awsPropiedadesSistema.getRegistro().getBucketName() )
+										 .imageBucketName(awsPropiedadesSistema.getAutenticacion().getBucketFileContext().concat(multipartFile.getOriginalFilename()))
+										 .imageS3Bucket(awsPropiedadesSistema.getAutenticacion().getBucketName() )
 										 .build()
 					    )
 						.operationType("AUTH")
 						.build()
 			);
+			return procesarRespuesta(autenticacionBiometricaAWSResponse);
 		} catch (Exception e) {
 			log.error(ExceptionUtils.getMessage(e));
 			log.error(ExceptionUtils.getRootCauseMessage(e));
 			throw new RuntimeException(MessageStaticClass.ERR_PROCESO_AUTENTICACION.getMensaje());
 		}
-		return null;
 	}
 	
-	private void procesoConsumoAutenticacionDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
+	private AutenticacionBiometricaResponse procesarRespuesta(
+			AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
+		var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
+		if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
+			var rostroEncontrado = rostrosEncontrados.stream().filter(rostro -> rostro.getSimilarity() > UMBRAL_SIMILIRIDAD && !ObjectUtils.isEmpty(rostro.getFace().getExternalImageId())).findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
+			var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
+			var descargarArchivoS3Respuesta = almacenamientoService.descargarObjeto(
+					infoBiometrica.getRutaFoto(), 
+					infoBiometrica.getNombreFotografia()
+			);
+			log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta));
+			return null;
+		} else {
+			throw new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_ENCONTRADO.getMensaje());
+		}
+	}
+
+	private AutenticacionBiometricaAWSResponse procesoConsumoAutenticacionDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
 		try {
 			var endPointRegistro = new StringBuilder()
 					.append(awsPropiedadesSistema.getAwsApiService().getContext())
@@ -78,6 +104,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 			var response = client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
 			var autenticacionBiometricaAWSResponse = objectMapper.readValue(response.join().body(), AutenticacionBiometricaAWSResponse.class);
 			log.info("autenticacionBiometricaAWSResponse: ".concat(objectMapper.writeValueAsString(autenticacionBiometricaAWSResponse)));
+			return autenticacionBiometricaAWSResponse;
 		} catch (IOException e) {
 			log.error(ExceptionUtils.getMessage(e));
 			log.error(ExceptionUtils.getRootCauseMessage(e));

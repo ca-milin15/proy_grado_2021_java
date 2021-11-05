@@ -59,6 +59,7 @@ public class AWSRegistroServiceImpl implements RegistroService{
 							ObjectRequest.builder()
 										 .imageBucketName(imageBucketName)
 										 .imageS3Bucket(awsPropiedadesSistema.getRegistro().getBucketName() )
+										 .externalId(usuario.getId().toString())
 										 .build()
 					    )
 						.operationType("SIGNUP")

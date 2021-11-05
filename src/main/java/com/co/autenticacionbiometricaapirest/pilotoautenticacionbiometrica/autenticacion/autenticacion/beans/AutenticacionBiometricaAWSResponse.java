@@ -1,6 +1,7 @@
 package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,34 @@ public class AutenticacionBiometricaAWSResponse implements Serializable{
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public static class Body {
-		String imageId;
+		List<FaceMatch> faceMatches;
+		
+		@Getter
+		@Setter
+		@Builder
+		@AllArgsConstructor
+		@NoArgsConstructor
+		public static class FaceMatch implements Serializable {
+			
+			private static final long serialVersionUID = 8238452027870021720L;
+			
+			Integer similarity;
+			Face face;
+			
+			@Getter
+			@Setter
+			@Builder
+			@AllArgsConstructor
+			@NoArgsConstructor
+			public static class Face implements Serializable{
+				
+				private static final long serialVersionUID = -9155284751707541968L;
+				
+				String faceId;
+				String imageId;
+				String externalImageId;
+				Float confidence;
+			}
+		}
 	}
 }

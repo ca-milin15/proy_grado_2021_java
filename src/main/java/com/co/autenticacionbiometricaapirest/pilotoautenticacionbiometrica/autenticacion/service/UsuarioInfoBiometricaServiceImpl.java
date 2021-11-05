@@ -1,11 +1,14 @@
 package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.service;
 
+import java.math.BigInteger;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.model.UsuarioInfoBiometrica;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.repository.UsuarioInfoBiometricaRepository;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioInfoBiometricaConsultaErrorRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioInfoBiometricaPersistenciaRuntimeException;
 
 import lombok.AllArgsConstructor;
@@ -25,6 +28,16 @@ public class UsuarioInfoBiometricaServiceImpl implements UsuarioInfoBiometricaSe
 		} catch (Exception e) {
 			log.error(ExceptionUtils.getRootCauseMessage(e));
 			throw new UsuarioInfoBiometricaPersistenciaRuntimeException(MessageStaticClass.ERR_USUARIO_INFO_BIOM_PERSISTENCIA.getMensaje());
+		}
+	}
+
+	@Override
+	public UsuarioInfoBiometrica buscarInfoBiometricaPorUsuario(BigInteger idUsuario) {
+		try {
+			return usuarioInfoBiometricaRepository.findByUsuarioId(idUsuario);
+		} catch (Exception e) {
+			log.error(ExceptionUtils.getMessage(e));
+			throw new UsuarioInfoBiometricaConsultaErrorRuntimeException(MessageStaticClass.ERR_USUARIO_INFO_BIOM_CONSULTA.getMensaje());
 		}
 	}
 
