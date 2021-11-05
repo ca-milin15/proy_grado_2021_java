@@ -48,7 +48,7 @@ public class S3AlmacenamientoServiceImpl implements AlmacenamientoService {
 	}
 
 	@Override
-	public String descargarObjeto(String nombreRepositorioS3, String nombreArchivo) {
+	public Path descargarObjeto(String nombreRepositorioS3, String nombreArchivo) {
 		try {
 			var awsCredentials = new BasicAWSCredentials(
 					propiedadesSistema.getConfig().getAk(), 
@@ -59,7 +59,7 @@ public class S3AlmacenamientoServiceImpl implements AlmacenamientoService {
 			var object = s3ClientConfig.getObject(nombreRepositorioS3, nombreArchivo);
 			var pathFileToDownload = Paths.get(System.getProperty("java.io.tmpdir"), nombreArchivo);
 			FileUtils.copyInputStreamToFile(object.getObjectContent(), pathFileToDownload.toFile());
-			return pathFileToDownload.toString();
+			return pathFileToDownload;
 		} catch (Exception e) {
 			log.error(ExceptionUtils.getMessage(e));
 			log.error(ExceptionUtils.getRootCauseMessage(e));

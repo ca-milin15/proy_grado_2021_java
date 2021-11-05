@@ -8,6 +8,7 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.almacenamiento.AlmacenamientoService;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionBiometricaAWSResponse;
-import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionBiometricaResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest.ObjectRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.service.UsuarioInfoBiometricaService;
@@ -44,7 +44,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	private final static Integer UMBRAL_SIMILIRIDAD = 99;
 	
 	@Override
-	public AutenticacionBiometricaResponse autenticar(MultipartFile multipartFile) {
+	public Path autenticar(MultipartFile multipartFile) {
 		try {
 			var fotografia = Utilidades.crearArchivoDesdeMultipart(multipartFile);
 			var cargarArchivoS3Respuesta = almacenamientoService.cargarObjeto(
@@ -73,7 +73,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 		}
 	}
 	
-	private AutenticacionBiometricaResponse procesarRespuesta(
+	private Path procesarRespuesta(
 			AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
 		var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
 		if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
@@ -83,8 +83,8 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 					infoBiometrica.getRutaFoto(), 
 					infoBiometrica.getNombreFotografia()
 			);
-			log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta));
-			return null;
+			log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta.toString()));
+			return descargarArchivoS3Respuesta;
 		} else {
 			throw new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_ENCONTRADO.getMensaje());
 		}

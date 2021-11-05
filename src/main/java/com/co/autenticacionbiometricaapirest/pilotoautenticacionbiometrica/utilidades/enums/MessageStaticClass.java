@@ -20,7 +20,9 @@ public enum MessageStaticClass {
 	ERR_USUARIO_INFO_BIOM_CONSULTA ("Ha ocurrido un error consultando la información biometrica del usuario."),
 
 	ERR_ROSTRO_NO_ENCONTRADO ("No se ha encontrado el rostro del usuario en el sistema."),
-	ERR_ROSTRO_NO_CUMPLE_REQ ("Se han encontrado posibles rostros correspondientes al usuario pero no cumplen con los requisitos.");
+	ERR_ROSTRO_NO_CUMPLE_REQ ("Se han encontrado posibles rostros correspondientes al usuario pero no cumplen con los requisitos."),
+	
+	ERR_CONST_ARCHIVO_DESCARGA ("Ha ocurrido un error en la descarga de la imagen.");
 	
 	String mensaje;
 
