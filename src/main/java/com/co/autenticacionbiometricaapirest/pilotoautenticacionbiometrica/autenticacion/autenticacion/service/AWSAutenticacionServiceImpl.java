@@ -76,6 +76,8 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	private Path procesarRespuesta(
 			AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
 		var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
+
+		log.info("Limite del umbral: ".concat(UMBRAL_SIMILIRIDAD.toString()));
 		if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
 			var rostroEncontrado = rostrosEncontrados.stream().filter(rostro -> rostro.getSimilarity() >= UMBRAL_SIMILIRIDAD && !ObjectUtils.isEmpty(rostro.getFace().getExternalImageId())).findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
 			var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
