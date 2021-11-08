@@ -80,15 +80,21 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 			var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
 			log.info("Limite del umbral: ".concat(UMBRAL_SIMILIRIDAD.toString()));
 			if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
+				log.info("1");
 				var rostroEncontrado = rostrosEncontrados.stream()
-						.filter(rostroNull -> !ObjectUtils.isEmpty(rostroNull.getFace().getExternalImageId()))
+						.filter(rostroNull -> !ObjectUtils.isEmpty(rostroNull) && !ObjectUtils.isEmpty(rostroNull.getFace()) && !ObjectUtils.isEmpty(rostroNull.getFace().getExternalImageId()))
 						.filter(rostro -> rostro.getSimilarity() >= UMBRAL_SIMILIRIDAD)
 						.findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
+
+				log.info("2");
 				var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
+
+				log.info("3");
 				var descargarArchivoS3Respuesta = almacenamientoService.descargarObjeto(
 						infoBiometrica.getRutaFoto(), 
 						infoBiometrica.getNombreFotografia()
 				);
+				log.info("4");
 				log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta.toString()));
 				return descargarArchivoS3Respuesta;
 			} else {
