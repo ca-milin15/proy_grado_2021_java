@@ -24,6 +24,7 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.auten
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.config.AWSPropiedadesSistema;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.Utilidades;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.ProcesoRostrosEncontradosRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.RostroNoEncontradoRuntimeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -75,20 +76,27 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	
 	private Path procesarRespuesta(
 			AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
-		var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
-
-		log.info("Limite del umbral: ".concat(UMBRAL_SIMILIRIDAD.toString()));
-		if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
-			var rostroEncontrado = rostrosEncontrados.stream().filter(rostro -> !ObjectUtils.isEmpty(rostro.getFace().getExternalImageId()) && rostro.getSimilarity() >= UMBRAL_SIMILIRIDAD).findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
-			var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
-			var descargarArchivoS3Respuesta = almacenamientoService.descargarObjeto(
-					infoBiometrica.getRutaFoto(), 
-					infoBiometrica.getNombreFotografia()
-			);
-			log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta.toString()));
-			return descargarArchivoS3Respuesta;
-		} else {
-			throw new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_ENCONTRADO.getMensaje());
+		try {
+			var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
+			log.info("Limite del umbral: ".concat(UMBRAL_SIMILIRIDAD.toString()));
+			if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
+				var rostroEncontrado = rostrosEncontrados.stream()
+						.filter(rostroNull -> !ObjectUtils.isEmpty(rostroNull.getFace().getExternalImageId()))
+						.filter(rostro -> rostro.getSimilarity() >= UMBRAL_SIMILIRIDAD)
+						.findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
+				var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
+				var descargarArchivoS3Respuesta = almacenamientoService.descargarObjeto(
+						infoBiometrica.getRutaFoto(), 
+						infoBiometrica.getNombreFotografia()
+				);
+				log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta.toString()));
+				return descargarArchivoS3Respuesta;
+			} else {
+				throw new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_ENCONTRADO.getMensaje());
+			}
+		} catch (Exception e) {
+			log.error(ExceptionUtils.getRootCauseMessage(e));
+			throw new ProcesoRostrosEncontradosRuntimeException(MessageStaticClass.ERR_PROCESO_ROSTROS_ENCON.getMensaje());
 		}
 	}
 

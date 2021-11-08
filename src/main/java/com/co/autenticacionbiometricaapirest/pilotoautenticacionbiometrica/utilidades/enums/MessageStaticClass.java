@@ -22,6 +22,8 @@ public enum MessageStaticClass {
 	ERR_ROSTRO_NO_ENCONTRADO ("No se ha encontrado el rostro del usuario en el sistema."),
 	ERR_ROSTRO_NO_CUMPLE_REQ ("Se han encontrado posibles rostros correspondientes al usuario pero no cumplen con los requisitos."),
 	
+	ERR_PROCESO_ROSTROS_ENCON ("Se ha producido un error en el procesamiento de los rostros encontrados."),
+	
 	ERR_CONST_ARCHIVO_DESCARGA ("Ha ocurrido un error en la descarga de la imagen.");
 	
 	String mensaje;
