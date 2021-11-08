@@ -41,7 +41,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	UsuarioInfoBiometricaService usuarioInfoBiometricaService;
 
 	
-	private final static Integer UMBRAL_SIMILIRIDAD = 99;
+	private final static Integer UMBRAL_SIMILIRIDAD = 98;
 	
 	@Override
 	public Path autenticar(MultipartFile multipartFile) {
@@ -77,7 +77,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 			AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
 		var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
 		if(!CollectionUtils.isEmpty(rostrosEncontrados)) {
-			var rostroEncontrado = rostrosEncontrados.stream().filter(rostro -> rostro.getSimilarity() > UMBRAL_SIMILIRIDAD && !ObjectUtils.isEmpty(rostro.getFace().getExternalImageId())).findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
+			var rostroEncontrado = rostrosEncontrados.stream().filter(rostro -> rostro.getSimilarity() >= UMBRAL_SIMILIRIDAD && !ObjectUtils.isEmpty(rostro.getFace().getExternalImageId())).findFirst().orElseThrow(() -> new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_CUMPLE_REQ.getMensaje()));
 			var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
 			var descargarArchivoS3Respuesta = almacenamientoService.descargarObjeto(
 					infoBiometrica.getRutaFoto(), 
