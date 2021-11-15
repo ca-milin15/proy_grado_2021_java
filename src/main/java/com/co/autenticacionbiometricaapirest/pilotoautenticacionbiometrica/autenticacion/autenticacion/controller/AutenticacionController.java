@@ -1,6 +1,7 @@
 package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.controller;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.core.io.InputStreamResource;
@@ -39,7 +40,7 @@ public class AutenticacionController {
 					.contentLength(file.length())
 					.contentType(MediaType.APPLICATION_OCTET_STREAM)
 					.body(new InputStreamResource(new FileInputStream(file)));
-		} catch (Exception e) {
+		} catch (FileNotFoundException e) {
 			log.error(ExceptionUtils.getMessage(e));
 			throw new ArchivoProcesoDescargaRuntimeException(MessageStaticClass.ERR_CONST_ARCHIVO_DESCARGA.getMensaje());
 		}
