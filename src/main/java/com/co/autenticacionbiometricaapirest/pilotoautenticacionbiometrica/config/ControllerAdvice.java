@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.beans.ControllerAdviceResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.ProcesoRostrosEncontradosRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.RostroNoEncontradoRuntimeException;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioInfoBiometricaConsultaErrorRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioNoEncontradoRuntimeException;
 
 @org.springframework.web.bind.annotation.ControllerAdvice
@@ -29,6 +30,13 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(ProcesoRostrosEncontradosRuntimeException.class)
 	public ResponseEntity<ControllerAdviceResponse> procesoRostrosEncontradosRuntimeException(RuntimeException ex, WebRequest request){
+		var objetoRespuesta = new ControllerAdviceResponse(ex.getMessage(), ExceptionUtils.getMessage(ex));
+		return new ResponseEntity<>(objetoRespuesta, HttpStatus.CONFLICT);
+	}
+
+
+	@ExceptionHandler(UsuarioInfoBiometricaConsultaErrorRuntimeException.class)
+	public ResponseEntity<ControllerAdviceResponse> usuarioInfoBiometricaConsultaErrorRuntimeException(RuntimeException ex, WebRequest request){
 		var objetoRespuesta = new ControllerAdviceResponse(ex.getMessage(), ExceptionUtils.getMessage(ex));
 		return new ResponseEntity<>(objetoRespuesta, HttpStatus.CONFLICT);
 	}

@@ -11,6 +11,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -26,6 +27,7 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utili
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.ProcesoRostrosEncontradosRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.RostroNoEncontradoRuntimeException;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioInfoBiometricaConsultaErrorRuntimeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -40,6 +42,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	ObjectMapper objectMapper;
 	AWSPropiedadesSistema awsPropiedadesSistema;
 	UsuarioInfoBiometricaService usuarioInfoBiometricaService;
+	Environment environment;
 
 	
 	private final static Integer UMBRAL_SIMILIRIDAD = 98;
@@ -89,6 +92,11 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 				log.info("2");
 				var infoBiometrica = usuarioInfoBiometricaService.buscarInfoBiometricaPorUsuario(BigInteger.valueOf(Long.valueOf(rostroEncontrado.getFace().getExternalImageId().toString())));
 
+				if(ObjectUtils.isEmpty(infoBiometrica)) {
+					log.error("getExternalImageId".concat(rostroEncontrado.getFace().getExternalImageId().toString()));
+					throw new UsuarioInfoBiometricaConsultaErrorRuntimeException(MessageStaticClass.ERR_USUARIO_INFO_BIOM_CONSULTA.getMensaje());
+				}
+				
 				log.info("3");
 				var descargarArchivoS3Respuesta = almacenamientoService.descargarObjeto(
 						infoBiometrica.getRutaFoto(), 
@@ -108,13 +116,14 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 
 	private AutenticacionBiometricaAWSResponse procesoConsumoAutenticacionDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
 		try {
-			var endPointRegistro = new StringBuilder()
-					.append(awsPropiedadesSistema.getAwsApiService().getContext())
+			var endPointAutenticacion = new StringBuilder()
+					.append(awsPropiedadesSistema.getAwsApiService().getContext().concat(environment.getActiveProfiles()[0]).concat("/"))
 					.append(awsPropiedadesSistema.getAwsApiService().getRegistro().getEndPoint())
 					.toString();
+			log.info("Request endPointRegistro: ".concat(endPointAutenticacion));
 			var client = HttpClient.newBuilder().version(Version.HTTP_2).build();
 			var httpRequest = HttpRequest.newBuilder(
-					URI.create(endPointRegistro))
+					URI.create(endPointAutenticacion))
 					.POST(BodyPublishers.ofString(objectMapper.writeValueAsString(registroBiometriaAWSRequest)))
 					.build();
 			var response = client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());

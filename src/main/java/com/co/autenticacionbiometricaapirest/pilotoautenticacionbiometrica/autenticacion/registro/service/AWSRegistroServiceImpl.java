@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,7 @@ public class AWSRegistroServiceImpl implements RegistroService{
 	ObjectMapper objectMapper;
 	AWSPropiedadesSistema awsPropiedadesSistema;
 	UsuarioInfoBiometricaService usuarioInfoBiometricaService;
+	Environment environment;
 
 	@Override
 	public RegistroBiometriaResponse registrarDatosBiometricos(MultipartFile multipartFileFotografia, BigInteger idUsuario) {
@@ -82,9 +84,10 @@ public class AWSRegistroServiceImpl implements RegistroService{
 	private RegistroBiometriaResponse procesoConsumoRegistroDatosBiometricosAWS(RegistroBiometriaAWSRequest registroBiometriaAWSRequest) {
 		try {
 			var endPointRegistro = new StringBuilder()
-					.append(awsPropiedadesSistema.getAwsApiService().getContext())
+					.append(awsPropiedadesSistema.getAwsApiService().getContext().concat(environment.getActiveProfiles()[0]).concat("/"))
 					.append(awsPropiedadesSistema.getAwsApiService().getRegistro().getEndPoint())
 					.toString();
+			log.info("Request endPointRegistro: ".concat(endPointRegistro));
 			var client = HttpClient.newBuilder().version(Version.HTTP_2).build();
 			var httpRequest = HttpRequest.newBuilder(
 					URI.create(endPointRegistro))

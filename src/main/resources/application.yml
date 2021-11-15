@@ -51,7 +51,7 @@ amazon-properties:
     bucket-name: autenticacion-biometrica
     bucket-file-context: tmp/
   aws-api-service:
-    context: https://sna925yu4a.execute-api.us-east-1.amazonaws.com/dev/
+    context: https://sna925yu4a.execute-api.us-east-1.amazonaws.com/
     registro:
       end-point: registro-biometrico
     autenticacion:
