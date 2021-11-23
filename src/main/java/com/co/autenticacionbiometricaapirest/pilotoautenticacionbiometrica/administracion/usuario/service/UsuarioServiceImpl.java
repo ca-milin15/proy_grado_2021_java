@@ -2,6 +2,7 @@ package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admi
 
 import java.math.BigInteger;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -35,8 +36,12 @@ public class UsuarioServiceImpl implements UsuarioService{
 	
 	@Override
 	public UsuarioResponse crearUsuario(UsuarioRequest usuarioRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			var user = usuarioServiceRepository.save(new Usuario(usuarioRequest));
+			return  UsuarioResponse.builder().id(user.getId()).usuario(user.getUsuario()).nombre(user.getNombre()).apellido(user.getApellidos()).build();
+		} catch (Exception e) {
+			throw new RuntimeException(ExceptionUtils.getMessage(e));
+		}
 	}
 
 	@Override

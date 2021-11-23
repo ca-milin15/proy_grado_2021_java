@@ -7,6 +7,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.UsuarioRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.model.UsuarioInfoBiometrica;
 
 import lombok.AccessLevel;
@@ -44,4 +45,14 @@ public class Usuario extends EntidadGeneral{
 
 	@OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
 	UsuarioInfoBiometrica usuarioInfoBiometrica;
+	
+
+	public Usuario(UsuarioRequest usuarioRequest) {
+		this.usuario = usuarioRequest.getUsuario();
+		this.clave = usuarioRequest.getClave();
+		this.nombre = usuarioRequest.getNombre();
+		this.apellidos = usuarioRequest.getApellidos();
+		this.identificacion = usuarioRequest.getIdentificacion();
+	}
+
 }

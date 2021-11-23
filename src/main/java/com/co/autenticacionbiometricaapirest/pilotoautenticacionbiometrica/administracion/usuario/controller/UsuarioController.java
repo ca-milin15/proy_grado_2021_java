@@ -2,7 +2,6 @@ package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admi
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,19 +22,12 @@ public class UsuarioController {
 
 	UsuarioService usuarioService;
 
-	@PostMapping
+	@PostMapping("autoregistro")
 	@ResponseStatus(value = HttpStatus.OK)
-	public UsuarioResponse registrarDatosBiometricos(@RequestBody UsuarioRequest usuarioRequest){
+	public UsuarioResponse autoregistro(@RequestBody UsuarioRequest usuarioRequest){
 		return usuarioService.crearUsuario(usuarioRequest);
 	}
-
-	@PutMapping
-	@ResponseStatus(value = HttpStatus.OK)
-	public UsuarioResponse actualizarDatosBiometricos(@RequestBody UsuarioRequest usuarioRequest){
-		return usuarioService.actualizarUsuario(usuarioRequest);
-	}
 	
-
 	@PostMapping("autenticacion-basica")
 	@ResponseStatus(value = HttpStatus.OK)
 	public AutenticacionBasicaResponse autenticacionBasica(@RequestBody AutenticacionBasicaRequest autenticacionBasicaRequest){

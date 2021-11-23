@@ -18,5 +18,7 @@ public class UsuarioRequest implements Serializable{
 
 	String usuario;
 	String clave;
-	
+	String nombre;
+	String apellidos;
+	String identificacion;
 }

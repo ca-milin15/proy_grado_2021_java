@@ -32,11 +32,12 @@ public class AutenticacionController {
 	@PostMapping
 	public ResponseEntity<InputStreamResource> registrarDatosBiometricos(@RequestPart MultipartFile fotografia) {
 		try {
-			var pathFile = autenticacionService.autenticar(fotografia);
+			var autenticacionDTO = autenticacionService.autenticar(fotografia);
+			var pathFile = autenticacionDTO.getArchivoAutenticacion();
 			var file = pathFile.toFile();
 			return ResponseEntity.ok()
 					.header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=".concat(file.getName()))
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=".concat(file.getName()).concat(";usuario=").concat(autenticacionDTO.getUsuarioResponse().getNombreCompleto()))
 					.contentLength(file.length())
 					.contentType(MediaType.APPLICATION_OCTET_STREAM)
 					.body(new InputStreamResource(new FileInputStream(file)));

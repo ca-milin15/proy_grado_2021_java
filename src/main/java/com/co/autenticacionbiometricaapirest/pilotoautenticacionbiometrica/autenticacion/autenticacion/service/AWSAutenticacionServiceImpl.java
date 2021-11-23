@@ -8,7 +8,6 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.core.env.Environment;
@@ -17,8 +16,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.beans.UsuarioResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.almacenamiento.AlmacenamientoService;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionBiometricaAWSResponse;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.autenticacion.beans.AutenticacionDTO;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.registro.beans.RegistroBiometriaAWSRequest.ObjectRequest;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.autenticacion.service.UsuarioInfoBiometricaService;
@@ -46,7 +47,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 	private final static Integer UMBRAL_SIMILIRIDAD = 98;
 
 	@Override
-	public Path autenticar(MultipartFile multipartFile) {
+	public AutenticacionDTO autenticar(MultipartFile multipartFile) {
 		try {
 			var fotografia = Utilidades.crearArchivoDesdeMultipart(multipartFile);
 			var cargarArchivoS3Respuesta = almacenamientoService.cargarObjeto(
@@ -69,7 +70,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 		}
 	}
 
-	private Path procesarRespuesta(AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
+	private AutenticacionDTO procesarRespuesta(AutenticacionBiometricaAWSResponse autenticacionBiometricaAWSResponse) {
 		if (!ObjectUtils.isEmpty(autenticacionBiometricaAWSResponse.getBody())) {
 			var rostrosEncontrados = autenticacionBiometricaAWSResponse.getBody().getFaceMatches();
 			log.info("Limite del umbral: ".concat(UMBRAL_SIMILIRIDAD.toString()));
@@ -98,7 +99,7 @@ public class AWSAutenticacionServiceImpl implements AutenticacionService {
 						infoBiometrica.getNombreFotografia());
 				log.info("4");
 				log.info("descargarArchivoS3Respuesta: ".concat(descargarArchivoS3Respuesta.toString()));
-				return descargarArchivoS3Respuesta;
+				return AutenticacionDTO.builder().archivoAutenticacion(descargarArchivoS3Respuesta).usuarioResponse(new UsuarioResponse(infoBiometrica.getUsuario())).build();
 			} else {
 				throw new RostroNoEncontradoRuntimeException(MessageStaticClass.ERR_ROSTRO_NO_ENCONTRADO.getMensaje());
 			}
