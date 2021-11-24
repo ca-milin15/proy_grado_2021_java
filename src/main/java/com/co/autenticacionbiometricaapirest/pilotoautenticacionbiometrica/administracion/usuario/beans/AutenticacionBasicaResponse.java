@@ -28,12 +28,9 @@ public class AutenticacionBasicaResponse implements Serializable{
 	
 
 	public AutenticacionBasicaResponse(Usuario usuarioAutenticado) {
-		var perfil = usuarioAutenticado.getPerfil();
 		this.id = usuarioAutenticado.getId();
 		this.usuario = usuarioAutenticado.getUsuario();
 		this.nombre = usuarioAutenticado.getNombre();
 		this.apellido = usuarioAutenticado.getApellidos();
-		this.idPerfil = perfil.getId();
-		this.nombrePerfil = perfil.getNombre();
 	}
 }
