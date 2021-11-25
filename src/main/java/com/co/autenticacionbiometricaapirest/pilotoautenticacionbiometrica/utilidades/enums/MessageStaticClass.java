@@ -19,6 +19,7 @@ public enum MessageStaticClass {
 	ERR_USUARIO_INFO_BIOM_PERSISTENCIA ("Ha ocurrido un error almacenando la información biometrica del usuario."),
 	ERR_USUARIO_INFO_BIOM_CONSULTA ("Ha ocurrido un error consultando la información biometrica del usuario."),
 	ERR_USUARIO_INFO_BIOM_EXISTENTE ("El usuario ya tiene datos biometricos registrados en el sistema."),
+	ERR_USUARIO_DUPLICADO ("El usuario ya esta siendo utilizado por otra persona."),
 
 	ERR_ROSTRO_NO_ENCONTRADO ("No se ha encontrado el rostro del usuario en el sistema."),
 	ERR_ROSTRO_NO_CUMPLE_REQ ("Se han encontrado posibles rostros correspondientes al usuario pero no cumplen con los requisitos."),

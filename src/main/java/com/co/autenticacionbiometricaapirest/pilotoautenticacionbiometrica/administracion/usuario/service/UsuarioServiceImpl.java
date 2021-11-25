@@ -2,7 +2,7 @@ package com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admi
 
 import java.math.BigInteger;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -13,6 +13,7 @@ import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.admin
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.model.Usuario;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.administracion.usuario.repository.UsuarioServiceRepository;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.enums.MessageStaticClass;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioDuplicadoRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioNoEncontradoRuntimeException;
 
 import lombok.AllArgsConstructor;
@@ -39,8 +40,8 @@ public class UsuarioServiceImpl implements UsuarioService{
 		try {
 			var user = usuarioServiceRepository.save(new Usuario(usuarioRequest));
 			return  UsuarioResponse.builder().id(user.getId()).usuario(user.getUsuario()).nombre(user.getNombre()).apellido(user.getApellidos()).build();
-		} catch (Exception e) {
-			throw new RuntimeException(ExceptionUtils.getMessage(e));
+		} catch (DataIntegrityViolationException e) {
+			throw new UsuarioDuplicadoRuntimeException(MessageStaticClass.ERR_USUARIO_DUPLICADO.getMensaje());
 		}
 	}
 

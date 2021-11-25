@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.beans.ControllerAdviceResponse;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.ProcesoRostrosEncontradosRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.RostroNoEncontradoRuntimeException;
+import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioDuplicadoRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioInfoBiometricaConsultaErrorRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioInfoBiometricaExistenteRuntimeException;
 import com.co.autenticacionbiometricaapirest.pilotoautenticacionbiometrica.utilidades.exception.UsuarioNoEncontradoRuntimeException;
@@ -44,6 +45,12 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(UsuarioInfoBiometricaExistenteRuntimeException.class)
 	public ResponseEntity<ControllerAdviceResponse> usuarioInfoBiometricaExistenteRuntimeException(RuntimeException ex, WebRequest request){
+		var objetoRespuesta = new ControllerAdviceResponse(ex.getMessage(), ExceptionUtils.getMessage(ex));
+		return new ResponseEntity<>(objetoRespuesta, HttpStatus.CONFLICT);
+	}
+
+	@ExceptionHandler(UsuarioDuplicadoRuntimeException.class)
+	public ResponseEntity<ControllerAdviceResponse> usuarioDuplicadoRuntimeException(RuntimeException ex, WebRequest request){
 		var objetoRespuesta = new ControllerAdviceResponse(ex.getMessage(), ExceptionUtils.getMessage(ex));
 		return new ResponseEntity<>(objetoRespuesta, HttpStatus.CONFLICT);
 	}
